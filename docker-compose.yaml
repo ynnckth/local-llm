@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ollama:/root/.ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+
+  ollama-web-ui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ollama-web-ui
+    ports: 
+      - "3000:8080"
+    volumes: 
+      - open-webui:/app/backend/data
+    environment:
+      - 'OLLAMA_API_BASE_URL=http://ollama:11434/api'
+      - 'WEBUI_SECRET_KEY='
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama: {}
+  open-webui: {}
